@@ -6,16 +6,13 @@ import numpy as np
 from utils import *
 
 # Get image
-#subprocess.call("gen_image.sh", shell=True)
+subprocess.call("gen_image.sh", shell=True)
 
 # PARAMETERS -- MODIFY HERE
 
 # Initial size image
 WIDTH = 24
 HEIGHT = 24
-
-WIDTH_MaxPool = 12
-HEIGHT_MaxPool = 
 
 # Convolution matrix
 H=np.array([[[1,2,3],[1,2,3],[1,2,3]], [[1,2,3],[1,2,3],[1,2,3]], [[1,2,3],[1,2,3],[1,2,3]]])
@@ -85,54 +82,18 @@ def convolution(Image, H_list):
 	
 
 # --- Get Image ---
-
-def relu(img):
-
-	(width, height, channel) = img.shape
-	Relu_img = np.zeros((width,height,channel), np.float32)
+"""
+def relu(Image, H_list):
+	Res_Image = np.zeros((WIDTH,HEIGHT,H_list.shape), np.float32) #H_list = number of channels
 	
-	bias = np.zeros(channel, np.float32)
-	print(channel)
-	for k in range( 0, channel):
-		for i in range( 0, width):
-    			for j in range( 0, height):
-				Relu_img[i,j,k] = img[i][j][k] + bias[k]
-			if (Relu_img[i][j][k] < 0):
-				Relu_img[i,j,k] = 0
-					
-	return Relu_img
-
-# --- Max Pool ---
-
-def Max_Pool(img):
-
-	img_reshape = np.insert(img, 0, 0, axis=0)
-			
-	img_reshape = np.insert(img, 0, 0, axis=1)
-	
-	(width, height, channel) = img_reshape.shape
-			
-	MaxPool_img = np.zeros((width, height, channel), np.float32)
+	for H in H_list: # nombre de canaux	
+		for i in range( 0, WIDTH):
+ 	    		for j in range( 0, HEIGHT):
+				for k in range(0,3):
+					Res_Image[i][j][counter]	
 
 
-	for k in range( 0, channel):
-		for i in range( 0, width//2):
-    			for j in range( 0, height//2):
-				# TODO:MaxPool_img[i][j][k] = Max_Matrix(img_reshape[i,j,k])
-		
-					
-	return MaxPool_img
-
-def Max_Matrix(matrix):
-	max_value = 0
-	
-	for i in range( 0, 3):
-		for j in range( 0, 3):
-			if( matrix[i][j]> max_value)			
-				max_value = matrix[i][j] 
-			
-	return max_value; 
-
+	return e_x """
 
 # --- Get Image ---
 
@@ -164,7 +125,7 @@ with open('image.ppm') as img:
 						total_elements = len(tab_line)
 						cnt = 0
 					
-				Image[i,j,k] = int(tab_line[cnt]) # Conv ASCII to int
+				Image[i,j,k] = int(tab_line[cnt]) # Convert ASCII to int
 				cnt+=1
 				
 			
@@ -182,15 +143,29 @@ Image = normalize(Image)
 
 Res_Image = convolution(Image, H_l)
 
-# --- RELU ---
-
-Relu_img = relu(Res_Image);
-
-
 print(Res_Image)
 
+# The MAIN function 
 
+def main(argv):             
+    image = "image.ppm"      
+    try:              
+        opts, args = getopt.getopt(argv, "hi:d", ["help", "image="])
+    except getopt.GetoptError: 
+        usage()           
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            usage()  
+            sys.exit()
+        elif opt == '-d':
+            global _debug
+            _debug = 1                  
+        elif opt in ("-i", "--image"): 
+            image = arg               
 
+    # some additionnal logic 
 
-
-
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
