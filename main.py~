@@ -1,0 +1,268 @@
+import subprocess
+from math import *
+import numpy as np
+
+# Import custom libs
+from utils import *
+
+# Get image
+#subprocess.call("gen_image.sh", shell=True)
+
+# PARAMETERS -- MODIFY HERE
+
+# Initial size image
+WIDTH_Conv_1 = 24
+HEIGHT_Conv_1 = 24
+
+WIDTH_Max_1 = 12
+HEIGHT_Max_1 = 12
+
+WIDTH_Conv_2 = 12
+HEIGHT_Conv_2 = 12
+
+WIDTH_Max_2 = 6
+HEIGHT_Max_2 = 6
+
+WIDTH_Conv_3 = 6
+HEIGHT_Conv_3 = 6
+
+WIDTH_Max_3 = 3
+HEIGHT_Max_3 = 3
+# Convolution matrix
+H=np.array([[[1,2,3],[1,2,3],[1,2,3]], [[1,2,3],[1,2,3],[1,2,3]], [[1,2,3],[1,2,3],[1,2,3]]])#First Convolution
+
+H_l = []
+H_l.append( H )
+H_l.append( H )
+H_l.append( H )
+H_l.append( H )
+
+H2 = np.array([[[4,5,6,7],[4,5,6,7],[4,5,6,7]],[[4,5,6,7],[4,5,6,7],[4,5,6,7]], [[4,5,6,7],[4,5,6,7],[4,5,6,7]]]) #Second Convolution
+
+H_l2 = []
+H_l2.append( H2 )
+H_l2.append( H2 )
+
+
+H3 = np.array([[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]]]) #Third Convolution
+
+H_l3 = []
+H_l3.append( H3 )
+H_l3.append( H3 )
+H_l3.append( H3 )
+H_l3.append( H3 )
+H_l3.append( H3 )
+
+
+# Options :
+np.set_printoptions(threshold=np.nan)
+
+# Init variables
+Header = []
+tab_line = ''
+width = 0
+height = 0
+total_elements = 0
+cnt = 0
+
+# --- Functions def ---
+
+
+def convolution(Image, H_list, WIDTH, HEIGHT):
+	"""
+	Input : Image to convolute, number of channels in the output, H matrices
+	Output : Image with size width*height*channels 
+	"""
+	Res_Image = np.zeros((WIDTH,HEIGHT,len(H_list)), np.float32) #H_list = number of channels
+
+	#print(H_list[0] )
+
+	(width_H, height_H, colors) = H_list[0].shape
+
+	counter = 0
+	
+	for H in H_list: # nombre de canaux
+
+		# Loop parameters
+
+		from_i = width_H % 2
+		to_i = WIDTH + from_i
+ 
+		from_j = height_H % 2
+		to_j = HEIGHT + from_j
+
+		# Add some padding to the initial image
+
+		for i in range( 0, from_i ):
+			Image = np.insert(Image, 0, 0, axis=0)
+			Image = np.insert(Image, WIDTH+1, 0, axis=0) # +1 because you aim a new inexisting line
+
+		for j in range( 0, from_j ):
+			Image = np.insert(Image, 0, 0, axis=1)
+			Image = np.insert(Image, HEIGHT+1, 0, axis=1)
+
+		for i in range( from_i, to_i):
+			for j in range( from_j, to_j):
+				# attention il faut changer le H lors qu'on travaille avec plusieurs canaux :
+				(width_H, height_H, colors) = H.shape
+				Res_Image[i-from_i][j-from_j][counter] = np.sum( np.multiply( Image[i-from_i:i+from_i+1, j-from_j:j+from_j+1] , H ))
+
+		counter +=1
+
+	return Res_Image 
+	
+
+# --- Get Image ---
+
+def relu(img):
+
+	(width, height, channel) = img.shape
+	Relu_img = np.zeros((width,height,channel), np.float32)
+	
+	bias = np.zeros(channel, np.float32)
+	#print(channel)
+	for k in range( 0, channel):
+		for i in range( 0, width):
+    			for j in range( 0, height):
+				Relu_img[i,j,k] = img[i][j][k] + bias[k]
+			if (Relu_img[i][j][k] < 0):
+				Relu_img[i,j,k] = 0
+					
+	return Relu_img
+
+# --- Max Pool ---
+
+def Max_Pool(img,WIDTH,HEIGHT):
+
+	img_reshape = np.insert(img, 0, 0, axis=0)#adding a ligne of zeros
+			
+	img_reshape = np.insert(img_reshape, 0, 0, axis=1)#adding a column of zeros
+	
+	(width, height, channel) = img_reshape.shape
+			
+	MaxPool_img = np.zeros((WIDTH, HEIGHT, channel), np.float32) #12x12x64
+
+	from_i = 0
+	from_j = 0
+	
+	for k in range( 0, channel):
+		for i in range( 0, WIDTH):
+    			for j in range( 0, HEIGHT):
+				MaxPool_img[i,j,k] = Max_Matrix(img_reshape[from_i:from_i+3,from_j:from_j+3,k])
+				from_j = from_j + 2
+				
+			from_j = 0 #to reinitialize from_j
+			from_i = from_i + 2
+        	from_i = 0
+				
+	return MaxPool_img
+
+# --- Max Pool's auxiliar function ---
+def Max_Matrix(matrix):
+	max_value = 0
+ 	
+	#print("AQUI \n")
+	for i in range( 0, 3):
+		for j in range( 0, 3):
+			if( matrix[i][j]> max_value):			
+				max_value = matrix[i][j] 
+			
+	return max_value; 
+
+
+# --- Get Image ---
+
+with open('image.ppm') as img:
+	# Header generation
+	Header.append(img.readline())
+	Header.append(img.readline())
+	Header.append(img.readline())
+
+	# Size generation
+	Header[1] = Header[1].replace('\n', '').split(' ')
+	width = int(Header[1][0])
+	height = int(Header[1][1])
+	
+	Image = np.zeros((width,height,3), np.uint8)
+
+	# Image generation : Keep in mind that the read line is maybe different to width of image
+	for i in range(0, height):
+		for j in range(0, width):
+			for k in range(0, 3): # k is for RGB management. We need 3 values to code one color.
+				if ( cnt == total_elements ):
+					tab_line = get_line(img)
+					total_elements = len(tab_line)
+					cnt = 0
+				if ( tab_line[cnt] == '' ):
+					cnt += 1
+					if ( cnt == total_elements ):
+						tab_line = get_line(img)
+						total_elements = len(tab_line)
+						cnt = 0
+					
+				Image[i,j,k] = int(tab_line[cnt]) # Conv ASCII to int
+				cnt+=1
+				
+
+# --- Image Resizing to 24 x 24 and normalizing ---
+
+Image = cut_image(Image, WIDTH_Conv_1, HEIGHT_Conv_1)
+Image = normalize(Image)
+
+# --- Convolution ---
+# http://www.f-legrand.fr/scidoc/docimg/image/filtrage/convolution/convolution.html
+
+print("Before first conv");
+
+Res_Image = convolution(Image, H_l, WIDTH_Conv_1, HEIGHT_Conv_1)
+
+print("After first conv");
+#print(Res_Image)
+
+# --- RELU ---
+print("Before first RELU");
+
+Relu_img = relu(Res_Image);
+
+print("After first conv");
+#print(relu_Image)
+
+# --- Max_Pool ----
+print("Before Max Pool");
+
+MaxPool_img = Max_Pool(Relu_img, WIDTH_Max_1, HEIGHT_Max_1)
+
+print("After Max Pool");
+#print(MaxPool_img)
+
+# --- Second convolution ---
+print("Before second conv");
+Res_Image = convolution(MaxPool_img, H_l2, WIDTH_Conv_2, HEIGHT_Conv_2)
+print("After second conv");
+
+# --- Second Max_Pool ----
+print("Before 2 Max Pool");
+
+MaxPool_img = Max_Pool(Res_Image, WIDTH_Max_2, HEIGHT_Max_2)
+
+print("After 2 Max Pool");
+#print(MaxPool_img)
+
+# --- Third convolution ---
+print("Before third conv");
+Res_Image = convolution(MaxPool_img, H_l3, WIDTH_Conv_3, HEIGHT_Conv_3)
+print("After third conv");
+
+# --- Second Max_Pool ----
+print("Before 3 Max Pool");
+
+MaxPool_img = Max_Pool(Res_Image, WIDTH_Max_3, HEIGHT_Max_3)
+
+print("After 3 Max Pool");
+#print(MaxPool_img)
+
+# --- Reshape ----
+(width, height, channel) = MaxPool_img.shape
+MaxPool_img = np.reshape(MaxPool_img, width*height*channel)
+
+
