@@ -1,5 +1,17 @@
 
 # Add a function to format white spaces
+def clean(text):
+	text = text.replace("  ", " ")
+	text = text.replace(" [", "[")
+	text = text.replace(" ]", "]")
+	text = text.replace("[ ", "[")
+	text = text.replace("] ", "]")
+
+	print(text)
+
+	return text
+	
+
 
 	
 # Recursive function to format
@@ -32,7 +44,7 @@ def recurs_array(text, i = 0):
 
 		# Then we split by using the indexes and the parameter whitespace
 		result = text[i:end].split(" ")
-		return result, end
+		return [float(e) for e in result], end
 	else :
 		return None, i
 	
@@ -71,11 +83,11 @@ def get_array(filename):
 			
 		
 
-test_list = "[[1 0][[1 0][2 3]]]"
+test_list = "[[ 1 0][[1 0]  [2 3 ]  ]]"
 
 print("GO")
 
-r =recurs_array(test_list)
+r =recurs_array(clean(test_list))
 
 print ("GO")
 print(r)
