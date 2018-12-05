@@ -1,5 +1,5 @@
-from math import *
 import numpy as np
+
 
 """ utils.py is dedicated to utils functions, you can find the following functions :
  """
@@ -10,59 +10,45 @@ def get_line( image ):
 	line = line.replace('\n', '').split(' ')
 	return line
 
-def cut_image( image, aimed_width, aimed_height ):
-	(width, height, depth) = image.shape
-	offset_width = 0
-	offset_height = 0
-	
-	new_Image = np.zeros((aimed_width, aimed_height, 3), np.uint8)
+def get_image(filename):
 
-	if (width >= aimed_width and height >= aimed_height):
-		offset_width = (width - aimed_width) // 2	
-		offset_height = (height - aimed_height) // 2
+	# Init
+	Header = []
+	tab_line = ""
+	total_elements = 0
+	cnt = 0
 
-		for j in range(offset_height, offset_height+aimed_width):
-			for i in range(offset_width, offset_width+aimed_height):
-				new_Image[i-offset_height][j-offset_width] = image[i][j]
-	else :
-		print('WARNING : The initial image is too small for the aimed resizing.');
-	
-	return new_Image
+	with open('image.ppm') as img:
+		# Header generation
+		Header.append(img.readline())
+		Header.append(img.readline())
+		Header.append(img.readline())
 
-def normalize( matrix ):
-	(width, height,depth) = matrix.shape
+		# Size generation
+		Header[1] = Header[1].replace('\n', '').split(' ')
+		width = int(Header[1][0])
+		height = int(Header[1][1])
+		
+		Image = np.zeros((width,height,3), np.uint8)
 
-	mean = 0
-	variance = 0
-	size = width * height * depth
+		# Image generation : Keep in mind that the read line is maybe different to width of image
+		for i in range(0, height):
+			for j in range(0, width):
+				for k in range(0, 3): # k is for RGB management. We need 3 values to code one color.
+					if ( cnt == total_elements ):
+						tab_line = get_line(img)
+						total_elements = len(tab_line)
+						cnt = 0
+					if ( tab_line[cnt] == '' ):
+						cnt += 1
+						if ( cnt == total_elements ):
+							tab_line = get_line(img)
+							total_elements = len(tab_line)
+							cnt = 0
+						
+					Image[i,j,k] = int(tab_line[cnt]) # Conv ASCII to int
+					cnt+=1
+	return Image
 
-	# compute mean 
-	for k in range(0, depth):
-		for i in range(0, width):
-			for j in range(0, height):
-				mean += matrix[i][j][k]
-	mean /= size
-	
-	# compute variance
-	for k in range(0, depth):
-		for i in range(0, width):
-			for j in range(0, height):
-				variance += (matrix[i][j][k] - mean)**2
-
-	variance /= size
-	variance = sqrt( variance )
-
-	new_matrix = np.zeros((width, height,depth), np.float32)
-	for k in range(0, depth):
-		for i in range(0, width):
-			for j in range(0, height):
-				new_matrix[i][j][k] = (matrix[i][j][k] - mean) / max( variance, 1/sqrt(size)) 
-	
-	return new_matrix 
-
-def softmax(x):
-	"""Compute softmax values for each sets of scores in x."""
-	e_x = np.exp(x - np.max(x))
-	return e_x / e_x.sum(axis=0)
 
 

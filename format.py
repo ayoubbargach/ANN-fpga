@@ -9,8 +9,6 @@ def clean(text):
 
 	return text
 	
-
-
 	
 # Recursive function to format
 def recursive_array(text, i=0):
@@ -55,13 +53,8 @@ def recursive_array(text, i=0):
 	else :
 		return None, i+1
 
-					
-	
 
-	
-filename = "CNN_coeff_3x3.txt"
-
-def get_array(filename):
+def get_config(filename):
 	""" Returns an array formatted from the filename issued	"""
 
 	key = ""
@@ -89,10 +82,6 @@ def get_array(filename):
 			
 			value = recursive_array(clean(value))
 			print(value)
-			
-
 
 	return content
 			
-		
-content = get_array(filename)
