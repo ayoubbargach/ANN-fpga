@@ -54,7 +54,7 @@ def main(argv):
 	# Options :
 	np.set_printoptions(threshold=np.nan)
 
-
+	
 	image_name = "image.raw"
 	flag_jump_img_gen = False
 	steps = 1
@@ -88,7 +88,7 @@ def main(argv):
 	for i in range(0, steps):
 		if not flag_jump_img_gen:
 			# Get image	
-			os.environ['PHELMA_ANN_PROJECT_STEPS'] = i
+			os.environ['PHELMA_ANN_PROJECT_OFFSET'] = i * 3073 + 1
 
 			# The bash script generate an image named image.ppm
 			subprocess.call("./gen_image.sh", shell=True)

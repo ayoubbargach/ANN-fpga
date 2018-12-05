@@ -7,7 +7,7 @@
  
  
 """
-
+import numpy as np
 
 # Add a function to format white spaces
 def clean(text):
@@ -66,25 +66,28 @@ def recursive_array(text, i=0):
 def get_new_config_format(config):
 	""" Function that analyze the previous extraction so it can suits our needs
 	"""
+	
 
 
 
+
+	# Each conv
+
+	config["conv1/weights"] = [ np.array([[[config["conv1/weights"][0][i][j][k][channel] for k in range(0, 3)] for j in range(0, 3)] for i in range(0, 3)]) for channel in range(0,64)]
+	config["conv2/weights"] = [ np.array([[[config["conv2/weights"][0][i][j][k][channel] for k in range(0, 64)] for j in range(0, 3)] for i in range(0, 3)]) for channel in range(0,32)]
+	config["conv3/weights"] = [ np.array([[[config["conv3/weights"][0][i][j][k][channel] for k in range(0, 32)] for j in range(0, 3)] for i in range(0, 3)]) for channel in range(0,20)]
+
+	# Perceptron
+	config["local3/weights"] = (np.array(config["local3/weights"][0])).transpose() # 2D array no need to add more information
+
+	# Bias management
+	
 	"""
-	tmp = config["conv1/weights"]
-
 	# print for channel 0
 
 	new_conf = [[[tmp[0][i][j][k][0] for k in range(0, 3)] for j in range(0, 3)] for i in range(0, 3)]
 
 	print(new_conf)"""
-
-	tmp = config["conv2/weights"]
-
-	# print for channel 0
-
-	new_conf = [[[tmp[0][i][j][k][0] for k in range(0, 3)] for j in range(0, 3)] for i in range(0, 3)]
-
-	print(new_conf)
 
 
 	return config
