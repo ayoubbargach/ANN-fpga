@@ -1,35 +1,20 @@
+"""
+ 
+    The purpose of this file
+    ----------------------
+ 
+    test
+ 
+ 
+"""
+
+
 from lib import *
-
-#------ Convolution matrix ----------------------------------------------------------------------------------------------------------
-
-# First Convolution Matrix 3X3X3
-H = np.array([[[1,2,3],[1,2,3],[1,2,3]],[[1,2,3],[1,2,3],[1,2,3]],[[1,2,3],[1,2,3],[1,2,3]]])
-
-H_l = []
-H_l.append( H )
-H_l.append( H )
-H_l.append( H )
-H_l.append( H ) # H_l = (3X3X3)x4
-
-# Second Convolution Matrix 3x3x4
-H2 = np.array([[[4,5,6,7],[4,5,6,7],[4,5,6,7]],[[4,5,6,7],[4,5,6,7],[4,5,6,7]],[[4,5,6,7],[4,5,6,7],[4,5,6,7]]]) 
-
-H_l2 = []
-H_l2.append( H2 )
-H_l2.append( H2 )#H_l2 = (3X3X4)x2
-
-# Third Convolution Matrix 3x3x2
-H3 = np.array([[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]]])
-
-H_l3 = []
-H_l3.append( H3 )
-H_l3.append( H3 )
-H_l3.append( H3 )
-H_l3.append( H3 )
-H_l3.append( H3 ) #H_l = (3X3X2)x5
 
 
 # Parameters
+
+CNN_model = "CNN_coeff_3x3.txt"
 
 WIDTH_Conv_1 = 24
 HEIGHT_Conv_1 = 24
@@ -49,7 +34,37 @@ HEIGHT_Conv_3 = 6
 WIDTH_Max_3 = 3
 HEIGHT_Max_3 = 3
 
-def model(image):
+def model(Image, conf):
+
+	#------ Convolution matrix ----------------------------------------------------------------------------------------------------------
+
+
+	# First Convolution Matrix 3X3X3
+	H = np.array([[[1,2,3],[1,2,3],[1,2,3]],[[1,2,3],[1,2,3],[1,2,3]],[[1,2,3],[1,2,3],[1,2,3]]])
+
+	H_l = []
+	H_l.append( H )
+	H_l.append( H )
+	H_l.append( H )
+	H_l.append( H ) # H_l = (3X3X3)x4
+
+	# Second Convolution Matrix 3x3x4
+	H2 = np.array([[[4,5,6,7],[4,5,6,7],[4,5,6,7]],[[4,5,6,7],[4,5,6,7],[4,5,6,7]],[[4,5,6,7],[4,5,6,7],[4,5,6,7]]]) 
+
+	H_l2 = []
+	H_l2.append( H2 )
+	H_l2.append( H2 )#H_l2 = (3X3X4)x2
+
+	# Third Convolution Matrix 3x3x2
+	H3 = np.array([[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]]])
+
+	H_l3 = []
+	H_l3.append( H3 )
+	H_l3.append( H3 )
+	H_l3.append( H3 )
+	H_l3.append( H3 )
+	H_l3.append( H3 ) #H_l = (3X3X2)x5
+
     # --- Image Resizing to 24 x 24 and normalizing ---
 
 	Image = cut_image(Image, WIDTH_Conv_1, HEIGHT_Conv_1)

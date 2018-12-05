@@ -1,3 +1,14 @@
+"""
+ 
+    The purpose of this file
+    ----------------------
+ 
+    test
+ 
+ 
+"""
+
+
 import numpy as np
 from math import sqrt
 

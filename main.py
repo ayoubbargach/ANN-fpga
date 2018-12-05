@@ -87,7 +87,7 @@ def main(argv):
 		os.environ['PHELMA_ANN_PROJECT_IMAGE_RAW'] = image_name
 
 	# Before going further, lets generate the model weights and biases (dictionary)
-	model_config = get_config("CNN_coeff_3x3.txt")
+	model_config = get_config(CNN_model)
 
 	for i in range(0, steps):
 		if not flag_jump_img_gen:
@@ -100,6 +100,10 @@ def main(argv):
 
 		# For each image, we want to generate an array to be manipulated by the model
 		image = get_image("image.ppm")
+
+
+		# Then lets apply the model on this image
+		model(image, model_config)
 
 
 

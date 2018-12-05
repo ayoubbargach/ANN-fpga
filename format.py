@@ -1,3 +1,13 @@
+"""
+ 
+    The purpose of this file
+    ----------------------
+ 
+    Get the matrices from the CNN txt file 
+ 
+ 
+"""
+
 
 # Add a function to format white spaces
 def clean(text):
@@ -65,7 +75,6 @@ def get_config(filename):
 			# we start by testing if we are in case of an array :
 			if line.startswith("tensor_name:") :
 				# OK, we are at the start of an array, lets get all the lines
-				print("We analyse the "+line)
 				# We add a new key value, key = line - { tensor_name } and value empty ""
 				key = line.replace("tensor_name:", "").strip()
 				content[key] = ""
@@ -81,7 +90,6 @@ def get_config(filename):
 			print("Generating an array for the key " + key)
 			
 			value = recursive_array(clean(value))
-			print(value)
 
 	return content
 			
