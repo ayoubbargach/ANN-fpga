@@ -50,10 +50,6 @@ def usage():
 
 """ Main function, it get the raw image, then generate step by step the small images using the script gen_script.sh """
 def main(argv):
-
-	# Init variables
-	width = 0
-	height = 0
 	
 	# Options :
 	np.set_printoptions(threshold=np.nan)

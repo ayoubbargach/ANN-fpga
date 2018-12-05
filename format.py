@@ -63,6 +63,33 @@ def recursive_array(text, i=0):
 	else :
 		return None, i+1
 
+def get_new_config_format(config):
+	""" Function that analyze the previous extraction so it can suits our needs
+	"""
+
+
+
+	"""
+	tmp = config["conv1/weights"]
+
+	# print for channel 0
+
+	new_conf = [[[tmp[0][i][j][k][0] for k in range(0, 3)] for j in range(0, 3)] for i in range(0, 3)]
+
+	print(new_conf)"""
+
+	tmp = config["conv2/weights"]
+
+	# print for channel 0
+
+	new_conf = [[[tmp[0][i][j][k][0] for k in range(0, 3)] for j in range(0, 3)] for i in range(0, 3)]
+
+	print(new_conf)
+
+
+	return config
+
+
 
 def get_config(filename):
 	""" Returns an array formatted from the filename issued	"""
@@ -89,7 +116,8 @@ def get_config(filename):
 		for key, value in content.iteritems() :
 			print("Generating an array for the key " + key)
 			
-			value = recursive_array(clean(value))
+			content[key] = recursive_array(clean(value))
 
-	return content
+
+	return get_new_config_format(content)
 			
