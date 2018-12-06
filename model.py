@@ -159,8 +159,14 @@ def model(Image, conf, target):
 
 	if (target == pos):
 		print("Target is reached ! Nice job.")
+		stats = [pos, target, 1.0]
 	else :
 		print("Not accurate, because target is : "+classes[target]+"." )
+		stats = [pos, target, 0.0]
+
+	
+
+	return stats
 
 
 	

@@ -53,14 +53,14 @@ def usage():
 def main(argv):
 
 	# Intro
-	print("\n ------- /!\ ANN-fpga /!\ -------  :\n")
+	print("\n ------- /!\ ANN-fpga STARTING /!\ -------  :\n")
 	
 	# Options :
 	np.set_printoptions(threshold=np.nan)
 	fileDir = os.path.dirname(os.path.realpath('__file__'))
 
 	
-	image_name = "../../cifar10_data/cifar-10-batches-bin/test_batch.bin"
+	image_name = "private/cifar-10-binary/cifar-10-batches-bin/test_batch.bin"
 	flag_jump_img_gen = False
 	steps = 1
 	target = 0
@@ -92,6 +92,7 @@ def main(argv):
 
 	# Before going further, lets generate the model weights and biases (dictionary)
 	model_config = get_config(CNN_model)
+	stats = []
 
 	for i in range(0, steps):
 		if not flag_jump_img_gen:
@@ -118,8 +119,18 @@ def main(argv):
 		image = get_image("image.ppm")
 
 
-		# Then lets apply the model on this image
-		model(image, model_config, target)
+		# Then lets apply the model on this image and add the stats
+		stats.append( model(image, model_config, target) )
+
+	accuracy = 0.0
+
+	# print the accuracy
+	for i in range( 0, len(stats)):
+		accuracy += stats[i][2]
+	
+	accuracy /= len(stats)
+
+	print("The accuracy for " + str(steps) + " steps : " + str(accuracy*100) + " %.")
 
 
 
