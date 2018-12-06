@@ -152,7 +152,7 @@ def model(Image, conf, target):
 	classes = ["airplane", "automobile", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
 
 	pos = np.argmax(img_final)
- 
+
 	# Get the class :
 
 	print("The class is : " + classes[pos])
