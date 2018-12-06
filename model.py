@@ -34,36 +34,36 @@ HEIGHT_Conv_3 = 6
 WIDTH_Max_3 = 3
 HEIGHT_Max_3 = 3
 
-def model(Image, conf):
+def model(Image, conf, target):
+	
+	# Intro
+	print("\n ------- /!\ ANN-fpga STEP /!\ -------  :\n")
 
 	#------ Convolution matrix ----------------------------------------------------------------------------------------------------------
 
 
 	# First Convolution Matrix 3X3X3
-	H = np.array([[[1,2,3],[1,2,3],[1,2,3]],[[1,2,3],[1,2,3],[1,2,3]],[[1,2,3],[1,2,3],[1,2,3]]])
 
-	H_l = []
-	H_l.append( H )
-	H_l.append( H )
-	H_l.append( H )
-	H_l.append( H ) # H_l = (3X3X3)x4
+	H_l = conf["conv1/weights"]
+	B1 = conf["conv1/biases"]
+
 
 	# Second Convolution Matrix 3x3x4
-	H2 = np.array([[[4,5,6,7],[4,5,6,7],[4,5,6,7]],[[4,5,6,7],[4,5,6,7],[4,5,6,7]],[[4,5,6,7],[4,5,6,7],[4,5,6,7]]]) 
 
-	H_l2 = []
-	H_l2.append( H2 )
-	H_l2.append( H2 )#H_l2 = (3X3X4)x2
+	H_l2 = conf["conv2/weights"]
+	B2 = conf["conv2/biases"]
 
 	# Third Convolution Matrix 3x3x2
-	H3 = np.array([[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]],[[4,5],[4,5],[4,5]]])
 
-	H_l3 = []
-	H_l3.append( H3 )
-	H_l3.append( H3 )
-	H_l3.append( H3 )
-	H_l3.append( H3 )
-	H_l3.append( H3 ) #H_l = (3X3X2)x5
+	H_l3 = conf["conv3/weights"]
+	B3 = conf["conv3/biases"]
+
+	# Perceptron
+
+	H_l4 = conf["local3/weights"]
+	B4 = conf["local3/biases"]
+
+
 
     # --- Image Resizing to 24 x 24 and normalizing ---
 
@@ -72,68 +72,107 @@ def model(Image, conf):
 
 	# ------ Convolution -------------------------------------------------------------------------------------------------------------------
 
-	print("Before First conv")
+	print("> First conv")
 
 	img_conv_1 = convolution(Image, H_l, WIDTH_Conv_1, HEIGHT_Conv_1)
 
-	print("After First conv")
 
 
 	# ----- RELU ---------------------------------------------------------------------------------------------------------------------
 
-	print("Before first RELU")
+	print("> First RELU")
 
-	img_relu_1 = relu(img_conv_1)
+	img_relu_1 = relu(img_conv_1, B1)
 
-	print("After first conv")
 
 
 	# ----- Max_Pool -----------------------------------------------------------------------------------------------------------------
-	print("Before Max Pool")
+	print("> Max Pool")
 
 	img_max_pool_1 = Max_Pool(img_relu_1, WIDTH_Max_1, HEIGHT_Max_1)
 
-	print("After Max Pool")
 
 
 	# ----- Second convolution -------------------------------------------------------------------------------------------------------
-	print("Before second conv")
+	print("> Before second conv")
 
 	img_conv_2 = convolution(img_max_pool_1, H_l2, WIDTH_Conv_2, HEIGHT_Conv_2)
 
-	print("After second conv")
+
+	# ----- RELU ---------------------------------------------------------------------------------------------------------------------
+
+	print("> Before second RELU")
+
+	img_relu_2 = relu(img_conv_2, B2)
+
 
 	# ----- Second Max_Pool ----------------------------------------------------------------------------------------------------------
-	print("Before 2 Max Pool")
+	print("> Before 2 Max Pool")
 
 	img_max_pool_2 = Max_Pool(img_conv_2, WIDTH_Max_2, HEIGHT_Max_2)
 
-	print("After 2 Max Pool")
 
 	# ----- Third convolution -------------------------------------------------------------------------------------------------------------
-	print("Before third conv")
+	print("> Before third conv")
 
 	img_conv_3 = convolution(img_max_pool_2, H_l3, WIDTH_Conv_3, HEIGHT_Conv_3)
 
-	print("After third conv")
+	
+	# ----- RELU ---------------------------------------------------------------------------------------------------------------------
+
+	print("> Before third RELU")
+
+	img_relu_3 = relu(img_conv_3, B3)
+
 
 	# ----- Third Max_Pool -------------------------------------------------------------------------------------------------------------
-	print("Before 3 Max Pool")
+	print("> Before 3 Max Pool")
 
-	img_max_pool_3 = Max_Pool(img_conv_3, WIDTH_Max_3, HEIGHT_Max_3)
+	img_max_pool_3 = Max_Pool(img_relu_3, WIDTH_Max_3, HEIGHT_Max_3)
 
-	print("After 3 Max Pool")
 
 	# ----- Reshape -----------------------------------------------------------------------------------------------------------------
-	print("Before Reshape")
+	print("> Reshape")
 
 	(width, height, channel) = img_max_pool_3.shape
 
-	img_reshape = np.reshape(img_max_pool_3, width*height*channel)
+	img_reshape = np.reshape(img_max_pool_3, width*height*channel, order='C')
 
 	# ----- Perceptron ---------------------------------------------------------------------------------------------------------------------
-	print("Before Perceptron")
+	print("> Perceptron")
 
-	img_perceptron = Perceptron(img_reshape)
+	img_perceptron = Perceptron(H_l4, img_reshape, B4)
 
-	print("After Perceptron")
+	# ----- Softmax and inference ---------------------------------------------------------------------------------------------------------------------
+	print("> Softmax and inference")
+
+	img_final = softmax(img_perceptron)
+
+
+	classes = ["airplane", "automobile", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
+
+	pos = np.argmax(img_final)
+
+	# Get the class :
+
+	print("The class is : " + classes[pos])
+
+	if (target == pos):
+		print("Target is reached ! Nice job.")
+	else :
+		print("Not accurate, because target is : "+classes[target]+"." )
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+

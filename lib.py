@@ -39,7 +39,7 @@ def cut_image( image, aimed_width, aimed_height ):
 
 
 def normalize( matrix ):
-	(width, height,depth) = matrix.shape
+	(width, height, depth) = matrix.shape
 
 	mean = 0
 	variance = 0
@@ -74,8 +74,8 @@ def normalize( matrix ):
 
 def softmax(x):
 	"""Compute softmax values for each sets of scores in x."""
-	e_x = np.exp(x - np.max(x))
-	return e_x / e_x.sum(axis=0)
+	e_x = np.exp(x)
+	return e_x / e_x.sum()
 
 
 
@@ -91,6 +91,8 @@ def convolution(img, H_list, WIDTH, HEIGHT):
 	(width_H, height_H, colors) = H_list[0].shape
 
 	counter = 0
+	
+	print(len(H_list))
 	
 	for H in H_list: # nombre de canaux
 
@@ -122,12 +124,11 @@ def convolution(img, H_list, WIDTH, HEIGHT):
 
 #------ Get Image ----------------------------------------------------------------------------------------------------------
 
-def relu(img):
+def relu(img, bias):
 
 	(width, height, channel) = img.shape
 	img_out = np.zeros((width,height,channel), np.float32)
 	
-	bias = np.zeros(channel, np.float32)
 	
 	for k in range( 0, channel):
 		for i in range( 0, width):
@@ -180,13 +181,15 @@ def Max_Matrix(img):
 
 #------ Fully Connected (Perceptron) ---------------------------------------------------------------------------------------------------
 
-def Perceptron(img):
+def Perceptron(Perceptron_Matrix, img, bias):
 
 	(width) = img.shape
 	
 	Perceptron_img = np.zeros(width,np.float32)
 
-	Perceptron_img = np.multiply(img,Perceptron_Matrix)
+	Perceptron_img = np.dot(Perceptron_Matrix, img)
+
+	Perceptron_img = Perceptron_img + bias
 
 	return Perceptron_img
 

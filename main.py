@@ -26,6 +26,7 @@ import subprocess
 import os
 import sys 
 import getopt
+import struct
 import numpy as np
 
 # Import custom libs
@@ -50,14 +51,19 @@ def usage():
 
 """ Main function, it get the raw image, then generate step by step the small images using the script gen_script.sh """
 def main(argv):
+
+	# Intro
+	print("\n ------- /!\ ANN-fpga /!\ -------  :\n")
 	
 	# Options :
 	np.set_printoptions(threshold=np.nan)
+	fileDir = os.path.dirname(os.path.realpath('__file__'))
 
 	
-	image_name = "image.raw"
+	image_name = "../../cifar10_data/cifar-10-batches-bin/test_batch.bin"
 	flag_jump_img_gen = False
 	steps = 1
+	target = 0
 
 	try:              
 		opts, args = getopt.getopt(argv, "hi:s:", ["help", "image=", "steps="])
@@ -81,6 +87,8 @@ def main(argv):
 	if not flag_jump_img_gen :
 		# Lets set an evironment variable to be used by the bash script
 		os.environ['PHELMA_ANN_PROJECT_IMAGE_RAW'] = image_name
+		
+
 
 	# Before going further, lets generate the model weights and biases (dictionary)
 	model_config = get_config(CNN_model)
@@ -88,10 +96,22 @@ def main(argv):
 	for i in range(0, steps):
 		if not flag_jump_img_gen:
 			# Get image	
-			os.environ['PHELMA_ANN_PROJECT_OFFSET'] = i * 3073 + 1
+			os.environ['PHELMA_ANN_PROJECT_OFFSET'] = str(i * 3073 + 1)
+			os.environ['PHELMA_ANN_PROJECT_STEP'] = str(i * 3073)
 
 			# The bash script generate an image named image.ppm
 			subprocess.call("./gen_image.sh", shell=True)
+			
+			
+			
+			with open("class.raw", "rb") as file_temp :
+
+				data = file_temp.read()
+				target = struct.unpack('>i', data)[0]
+
+				target = target >> 24 # We want only the first 8 bits
+				
+
 
 
 		# For each image, we want to generate an array to be manipulated by the model
@@ -99,7 +119,7 @@ def main(argv):
 
 
 		# Then lets apply the model on this image
-		model(image, model_config)
+		model(image, model_config, target)
 
 
 
@@ -118,3 +138,7 @@ def main(argv):
 if __name__ == "__main__":
     
     main(sys.argv[1:])
+
+
+
+

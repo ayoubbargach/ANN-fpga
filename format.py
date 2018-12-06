@@ -69,8 +69,6 @@ def get_new_config_format(config):
 	
 
 
-
-
 	# Each conv
 
 	config["conv1/weights"] = [ np.array([[[config["conv1/weights"][0][i][j][k][channel] for k in range(0, 3)] for j in range(0, 3)] for i in range(0, 3)]) for channel in range(0,64)]
@@ -81,7 +79,11 @@ def get_new_config_format(config):
 	config["local3/weights"] = (np.array(config["local3/weights"][0])).transpose() # 2D array no need to add more information
 
 	# Bias management
-	
+	config["conv1/biases"] = np.array(config["conv1/biases"][0])
+	config["conv2/biases"] = np.array(config["conv2/biases"][0])
+	config["conv3/biases"] = np.array(config["conv3/biases"][0])
+	config["local3/biases"] = np.array(config["local3/biases"][0])
+
 	"""
 	# print for channel 0
 
@@ -117,10 +119,8 @@ def get_config(filename):
 		# let us loop again in each key and generate an array for each of them
 		# Note that we simply replace the raw data with the generated array
 		for key, value in content.iteritems() :
-			print("Generating an array for the key " + key)
 			
 			content[key] = recursive_array(clean(value))
-
 
 	return get_new_config_format(content)
 			
