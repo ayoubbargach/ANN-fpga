@@ -112,7 +112,7 @@ def convolution(img, H_list, WIDTH, HEIGHT): # 4x4x3  (3x3x3)x2  4 4
 	for H in H_list: # nombre de canaux
 
 		sum_all = 0
-				
+		"""	
 		for i in range( from_i, to_i):
 			for j in range( from_j, to_j):
 				for k in range( 0, colors):	
@@ -121,7 +121,16 @@ def convolution(img, H_list, WIDTH, HEIGHT): # 4x4x3  (3x3x3)x2  4 4
 					
 					if(k == max_k):
 						img_out[i-from_i,j-from_j,counter] = sum_all
-						sum_all = 0
+						sum_all = 0 """
+			
+		for k in range( 0, colors):
+			for i in range( from_i, to_i):
+				for j in range( from_j, to_j):
+					sum_all += np.sum(np.multiply(img[i-from_i:i+from_i+1, j-from_j:j+from_j+1, k] , H[:,:,k] ))
+
+		img_out[i-from_i,j-from_j,counter] = sum_all
+		sum_all = 0 
+
 		counter +=1
 
 	return img_out 

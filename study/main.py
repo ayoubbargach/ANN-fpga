@@ -60,7 +60,7 @@ def main(argv):
 	fileDir = os.path.dirname(os.path.realpath('__file__'))
 
 	
-	image_name = "private/cifar-10-binary/cifar-10-batches-bin/test_batch.bin"
+	image_name = "../private/cifar-10-binary/cifar-10-batches-bin/test_batch.bin"
 	flag_jump_img_gen = False
 	steps = 1
 	target = 0
