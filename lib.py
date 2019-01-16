@@ -21,7 +21,7 @@ def cut_image( image, aimed_width, aimed_height ):
 	offset_width = 0
 	offset_height = 0
 	
-	new_Image = np.zeros((aimed_width, aimed_height, 3), np.uint8)
+	new_Image = np.zeros((aimed_width, aimed_height, 3), np.float32)
 
 	if (width >= aimed_width and height >= aimed_height):
 		offset_width = (width - aimed_width) // 2	
@@ -49,14 +49,14 @@ def normalize( matrix ):
 	for k in range(0, depth):
 		for i in range(0, width):
 			for j in range(0, height):
-				mean += matrix[i][j][k]
+				mean += matrix[i,j,k]
 	mean /= size
 	
 	# compute variance
 	for k in range(0, depth):
 		for i in range(0, width):
 			for j in range(0, height):
-				variance += (matrix[i][j][k] - mean)**2
+				variance += (matrix[i,j,k] - mean)**2
 
 	variance /= size
 	variance = sqrt( variance )
@@ -65,7 +65,7 @@ def normalize( matrix ):
 	for k in range(0, depth):
 		for i in range(0, width):
 			for j in range(0, height):
-				new_matrix[i][j][k] = (matrix[i][j][k] - mean) / max( variance, 1/sqrt(size)) 
+				new_matrix[i,j,k] = (matrix[i,j,k] - mean) / max( variance, 1/sqrt(size)) 
 	
 	return new_matrix
 
@@ -75,13 +75,13 @@ def normalize( matrix ):
 def softmax(x):
 	"""Compute softmax values for each sets of scores in x."""
 	e_x = np.exp(x)
-	return e_x / e_x.sum()
+	return e_x /e_x.sum()
 
 
 
 #------ Functions def  ----------------------------------------------------------------------------------------------------------
 
-def convolution(img, H_list, WIDTH, HEIGHT):
+def convolution(img, H_list, WIDTH, HEIGHT): # 4x4x3  (3x3x3)x2  4 4
 	"""
 	Input : Image to convolute, number of channels in the output, H matrices
 	Output : Image with size width*height*channels 
@@ -91,38 +91,37 @@ def convolution(img, H_list, WIDTH, HEIGHT):
 	(width_H, height_H, colors) = H_list[0].shape
 
 	counter = 0
+	max_k = colors-1  
 	
-	 #print(len(H_list))
-	
+	# Loop parameters
+	from_i = width_H % 2
+	to_i = WIDTH + from_i
+
+	from_j = height_H % 2
+	to_j = HEIGHT + from_j
+
+	# Add some padding to the initial image
+	for i in range( 0, from_i ):
+		img = np.insert(img, 0, 0, axis=0)
+		img = np.insert(img, WIDTH+1, 0, axis=0) # +1 because you aim a new inexisting line
+
+	for j in range( 0, from_j ):
+		img = np.insert(img, 0, 0, axis=1)
+		img = np.insert(img, HEIGHT+1, 0, axis=1)	
+
 	for H in H_list: # nombre de canaux
 
-		# Loop parameters
-		from_i = width_H % 2
-		to_i = WIDTH + from_i
- 
-		from_j = height_H % 2
-		to_j = HEIGHT + from_j
-
-		# Add some padding to the initial image
-		for i in range( 0, from_i ):
-			img = np.insert(img, 0, 0, axis=0)
-			img = np.insert(img, WIDTH+1, 0, axis=0) # +1 because you aim a new inexisting line
-
-		for j in range( 0, from_j ):
-			img = np.insert(img, 0, 0, axis=1)
-			img = np.insert(img, HEIGHT+1, 0, axis=1)
-
 		sum_all = 0
-
-		
+				
 		for i in range( from_i, to_i):
 			for j in range( from_j, to_j):
-				for k in range( 0, colors):
+				for k in range( 0, colors):	
+				
 					sum_all += np.sum(np.multiply(img[i-from_i:i+from_i+1, j-from_j:j+from_j+1, k] , H[:,:,k] ))
-
-				img_out[i-from_i][j-from_j][counter] = sum_all
-				sum_all = 0
-
+					
+					if(k == max_k):
+						img_out[i-from_i,j-from_j,counter] = sum_all
+						sum_all = 0
 		counter +=1
 
 	return img_out 
@@ -179,10 +178,10 @@ def Max_Matrix(img):
  	
 	for i in range( 0, 3):
 		for j in range( 0, 3):
-			if( img[i][j]> max_value):			
-				max_value = img[i][j] 
+			if( img[i,j]> max_value):			
+				max_value = img[i,j] 
 			
-	return max_value; 
+	return max_value
 
 
 #------ Fully Connected (Perceptron) ---------------------------------------------------------------------------------------------------
@@ -193,12 +192,27 @@ def Perceptron(Perceptron_Matrix, img, bias):
 	
 	Perceptron_img = np.zeros(width,np.float32)
 
-	Perceptron_img = np.dot(Perceptron_Matrix, img)
+	Perceptron_img = np.dot(img,Perceptron_Matrix)
 
 	Perceptron_img = Perceptron_img + bias
 
 	return Perceptron_img
 
+def Reshape(img):
+
+	(width, height, channel) = img.shape
+	
+	img_out = np.zeros((width*height*channel), np.float32)
+
+	index = 0
+	
+	for j in range( 0, height):
+		for i in range( 0, width):
+			for k in range( 0, channel):
+				img_out[index] = img[i,j,k]
+				index = index+1		
+
+	return img_out
 
 
 

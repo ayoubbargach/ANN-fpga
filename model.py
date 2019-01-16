@@ -36,8 +36,6 @@ HEIGHT_Max_3 = 3
 
 def model(Image, conf, target):
 	
-	# Intro
-	print("\n ------- /!\ ANN-fpga STEP /!\ -------  :\n")
 
 	#------ Convolution matrix ----------------------------------------------------------------------------------------------------------
 
@@ -46,7 +44,7 @@ def model(Image, conf, target):
 
 	H_l = conf["conv1/weights"]
 	B1 = conf["conv1/biases"]
-
+	
 
 	# Second Convolution Matrix 3x3x4
 
@@ -75,8 +73,6 @@ def model(Image, conf, target):
 	# print("> First conv")
 
 	img_conv_1 = convolution(Image, H_l, WIDTH_Conv_1, HEIGHT_Conv_1)
-
-
 
 	# ----- RELU ---------------------------------------------------------------------------------------------------------------------
 
@@ -109,7 +105,7 @@ def model(Image, conf, target):
 	# ----- Second Max_Pool ----------------------------------------------------------------------------------------------------------
 	# print("> Before 2 Max Pool")
 
-	img_max_pool_2 = Max_Pool(img_conv_2, WIDTH_Max_2, HEIGHT_Max_2)
+	img_max_pool_2 = Max_Pool(img_relu_2, WIDTH_Max_2, HEIGHT_Max_2)
 
 
 	# ----- Third convolution -------------------------------------------------------------------------------------------------------------
@@ -136,7 +132,7 @@ def model(Image, conf, target):
 
 	(width, height, channel) = img_max_pool_3.shape
 
-	img_reshape = np.reshape(img_max_pool_3, width*height*channel, order='C')
+	img_reshape = Reshape(img_max_pool_3)
 
 	# ----- Perceptron ---------------------------------------------------------------------------------------------------------------------
 	# print("> Perceptron")
@@ -161,24 +157,10 @@ def model(Image, conf, target):
 		print("Target is reached ! Nice job.")
 		stats = [pos, target, 1.0]
 	else :
-		print("Not accurate, because target is : "+classes[target]+"." )
+		print("Not accurate, because target is : " + classes[target]+"." )
 		stats = [pos, target, 0.0]
 
-	
 
 	return stats
-
-
-	
-
-
-
-
-
-
-
-
-
-
 
 

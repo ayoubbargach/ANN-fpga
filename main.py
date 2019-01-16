@@ -60,7 +60,7 @@ def main(argv):
 	fileDir = os.path.dirname(os.path.realpath('__file__'))
 
 	
-	image_name = "private/cifar-10-binary/cifar-10-batches-bin/test_batch.bin"
+	image_name = "../../cifar10_data/cifar-10-batches-bin/test_batch.bin"
 	flag_jump_img_gen = False
 	steps = 1
 	target = 0
@@ -118,7 +118,7 @@ def main(argv):
 		# For each image, we want to generate an array to be manipulated by the model
 		image = get_image("image.ppm")
 
-
+		print("\n ------- /!\ ANN-fpga STEP "+ str(i) +" /!\ -------  :\n")
 		# Then lets apply the model on this image and add the stats
 		stats.append( model(image, model_config, target) )
 

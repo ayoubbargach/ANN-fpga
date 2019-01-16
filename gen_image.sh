@@ -14,6 +14,6 @@ if [[ -z "${PHELMA_ANN_PROJECT_STEP}" ]]; then
 fi
 
 cat $PHELMA_ANN_PROJECT_IMAGE_RAW | dd count=3072 bs=1 skip=$PHELMA_ANN_PROJECT_OFFSET of=tmp.raw &> /dev/null
-cat $PHELMA_ANN_PROJECT_IMAGE_RAW | dd count=4 bs=1 skip=$PHELMA_ANN_PROJECT_STEP > class.raw
+cat $PHELMA_ANN_PROJECT_IMAGE_RAW | dd count=4 bs=1 skip=$PHELMA_ANN_PROJECT_STEP of=class.raw &> /dev/null
 # display -size 32x32 -depth 8 -interlace Plane rgb:tmp.raw
 convert -compress none -size 32x32 -depth 8 -interlace Plane rgb:tmp.raw image.ppm
