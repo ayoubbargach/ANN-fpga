@@ -1,3 +1,6 @@
+#ifndef __COEFFS_H__
+#define __COEFFS_H__
+
 #define BIASES1_NUM 64
 #define BIASES2_NUM 32
 #define BIASES3_NUM 20
@@ -17,9 +20,14 @@
 #define LOCAL3_WEIGHTS_i 180 //[180][10] //perceptron
 #define LOCAL3_WEIGHTS_j 10
 
+#define X_FILTRE 3
+#define Y_FILTRE 3
+#define K_FILTRE 3
+#define CH_FILTRE 4
+
 
 static double filtre[X_FILTRE][Y_FILTRE][K_FILTRE][CH_FILTRE] = { { {{ 0,0,0,0},{ 0,0,0,0}, {0,0,0,0}}, {{ 0,0,0,0},{ 0,0,0,0}, {0,0,0,0}}, {{ 0,0,0,0},{ 0,0,0,0}, {0,0,0,0}} } };
-
+/*
 static double biases1[BIASES1_NUM] = {  //TO DO: verify the double type 
 
 -0.96178979,-0.23917986,-0.23212402,-0.2245342,-1.71852744,-0.25244606
@@ -7072,3 +7080,6 @@ static double local3_weights[LOCAL3_BIASES_i}[LOCAL3_BIASES_j][LOCAL3_BIASES_k][
 ,{2.77840812e-02,-1.29483417e-02,6.51101470e-02,-3.86175662e-02
 ,5.91667406e-02,6.47545140e-03,-3.21667679e-02,8.65688622e-02
 ,-7.45184869e-02,2.34040506e-02}};
+*/
+
+#endif 
